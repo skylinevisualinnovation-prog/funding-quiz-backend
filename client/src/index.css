@@ -1,0 +1,276 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Google Fonts for Elevated Authority Design */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  /* Elevated Authority Design Palette */
+  --navy: #1a2a4a;
+  --navy-light: #2d3e5f;
+  --gold: #d4af37;
+  --gold-light: #e8c547;
+  --cream: #f5f3f0;
+  --cream-dark: #e8e6e3;
+  --charcoal: #2c2c2c;
+  --charcoal-light: #4a4a4a;
+  
+  --primary: var(--navy);
+  --primary-foreground: var(--cream);
+  --sidebar-primary: var(--navy);
+  --sidebar-primary-foreground: var(--cream);
+  --chart-1: var(--gold);
+  --chart-2: var(--gold-light);
+  --chart-3: var(--navy);
+  --chart-4: var(--navy-light);
+  --chart-5: var(--charcoal);
+  --radius: 0.5rem;
+  --background: var(--cream);
+  --foreground: var(--charcoal);
+  --card: var(--cream);
+  --card-foreground: var(--charcoal);
+  --popover: var(--cream);
+  --popover-foreground: var(--charcoal);
+  --secondary: var(--navy-light);
+  --secondary-foreground: var(--cream);
+  --muted: var(--cream-dark);
+  --muted-foreground: var(--charcoal-light);
+  --accent: var(--gold);
+  --accent-foreground: var(--navy);
+  --destructive: #e74c3c;
+  --destructive-foreground: var(--cream);
+  --border: var(--cream-dark);
+  --input: var(--cream-dark);
+  --ring: var(--gold);
+  --sidebar: var(--cream);
+  --sidebar-foreground: var(--charcoal);
+  --sidebar-accent: var(--gold);
+  --sidebar-accent-foreground: var(--navy);
+  --sidebar-border: var(--cream-dark);
+  --sidebar-ring: var(--gold);
+}
+
+.dark {
+  --primary: var(--color-blue-700);
+  --primary-foreground: var(--color-blue-50);
+  --sidebar-primary: var(--color-blue-500);
+  --sidebar-primary-foreground: var(--color-blue-50);
+  --background: oklch(0.141 0.005 285.823);
+  --foreground: oklch(0.85 0.005 65);
+  --card: oklch(0.21 0.006 285.885);
+  --card-foreground: oklch(0.85 0.005 65);
+  --popover: oklch(0.21 0.006 285.885);
+  --popover-foreground: oklch(0.85 0.005 65);
+  --secondary: oklch(0.24 0.006 286.033);
+  --secondary-foreground: oklch(0.7 0.005 65);
+  --muted: oklch(0.274 0.006 286.033);
+  --muted-foreground: oklch(0.705 0.015 286.067);
+  --accent: oklch(0.274 0.006 286.033);
+  --accent-foreground:  oklch(0.92 0.005 65);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.488 0.243 264.376);
+  --chart-1: var(--color-blue-300);
+  --chart-2: var(--color-blue-500);
+  --chart-3: var(--color-blue-600);
+  --chart-4: var(--color-blue-700);
+  --chart-5: var(--color-blue-800);
+  --sidebar: oklch(0.21 0.006 285.885);
+  --sidebar-foreground: oklch(0.85 0.005 65);
+  --sidebar-accent: oklch(0.274 0.006 286.033);
+  --sidebar-accent-foreground:  oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.488 0.243 264.376);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: -0.5px;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  /**
+   * Custom container utility that centers content and adds responsive padding.
+   *
+   * This overrides Tailwind's default container behavior to:
+   * - Auto-center content (mx-auto)
+   * - Add responsive horizontal padding
+   * - Set max-width for large screens
+   *
+   * Usage: <div className="container">...</div>
+   *
+   * For custom widths, use max-w-* utilities directly:
+   * <div className="max-w-6xl mx-auto px-4">...</div>
+   */
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem; /* 16px - mobile padding */
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+  
+  /* Typography System */
+  .font-display {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: -0.5px;
+  }
+  
+  .font-sans {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  /* Ornamental Divider */
+  .divider-ornamental {
+    @apply flex items-center justify-center gap-3 my-6;
+  }
+  
+  .divider-ornamental::before,
+  .divider-ornamental::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--navy), transparent);
+  }
+  
+  .divider-ornamental-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--navy);
+    border-radius: 50%;
+  }
+  
+  /* Circular Progress Ring */
+  .progress-ring {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+  
+  .progress-ring-circle {
+    transition: stroke-dashoffset 0.8s ease-in-out;
+    stroke: var(--gold);
+  }
+  
+  /* Premium Button Styles */
+  .btn-premium {
+    @apply px-8 py-3 rounded-md font-medium transition-all duration-200;
+    background: var(--navy);
+    color: var(--cream);
+    box-shadow: 0 4px 15px rgba(26, 42, 74, 0.2);
+  }
+  
+  .btn-premium:hover {
+    background: var(--navy-light);
+    box-shadow: 0 8px 25px rgba(26, 42, 74, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .btn-premium-accent {
+    @apply px-8 py-3 rounded-md font-medium transition-all duration-200;
+    background: var(--gold);
+    color: var(--navy);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+  }
+  
+  .btn-premium-accent:hover {
+    background: var(--gold-light);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  /* Card Elevation */
+  .card-elevated {
+    @apply rounded-lg p-8 bg-white;
+    box-shadow: 0 10px 40px rgba(26, 42, 74, 0.08);
+    border: 1px solid var(--cream-dark);
+  }
+  
+  /* Micro-credential Badge */
+  .badge-micro {
+    @apply w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm;
+    background: var(--gold);
+    color: var(--navy);
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem; /* 32px - desktop padding */
+      padding-right: 2rem;
+      max-width: 1280px; /* Standard content width */
+    }
+  }
+}
