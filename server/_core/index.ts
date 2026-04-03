@@ -18,7 +18,9 @@ async function startServer() {
 
   // OAuth routes
   registerOAuthRoutes(app);
-
+app.get("/", (_req, res) => {
+  res.status(200).send("Funding Quiz Backend is Live");
+});
   // tRPC API
   app.use(
     "/api/trpc",
