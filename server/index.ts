@@ -1,3 +1,6 @@
+import adminRoutes from "./routes/admin";
+
+app.use("/admin", adminRoutes);
 import express from "express";
 import { createServer } from "http";
 import path from "path";
