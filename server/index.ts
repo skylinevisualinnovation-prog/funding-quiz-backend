@@ -1,10 +1,9 @@
-import adminRoutes from "./routes/admin";
-
-app.use("/admin", adminRoutes);
 import express from "express";
 import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
+import adminRoutes from "./routes/admin";
+// import quizRoutes from "./routes/quiz"; // if you have this
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,7 +12,30 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // Serve static files from dist/public in production
+  // -----------------------------
+  // Middleware
+  // -----------------------------
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+
+  // -----------------------------
+  // API Routes (REGISTER FIRST)
+  // -----------------------------
+
+  app.use("/admin", adminRoutes);
+
+  // If you have quiz routes:
+  // app.use("/api/quiz", quizRoutes);
+
+  // Health check route (optional but smart)
+  app.get("/health", (_req, res) => {
+    res.json({ status: "ok" });
+  });
+
+  // -----------------------------
+  // Static Frontend Serving
+  // -----------------------------
+
   const staticPath =
     process.env.NODE_ENV === "production"
       ? path.resolve(__dirname, "public")
@@ -21,16 +43,25 @@ async function startServer() {
 
   app.use(express.static(staticPath));
 
-  // Handle client-side routing - serve index.html for all routes
+  // -----------------------------
+  // Catch-All (MUST BE LAST)
+  // -----------------------------
+
   app.get("*", (_req, res) => {
     res.sendFile(path.join(staticPath, "index.html"));
   });
 
-const port = process.env.PORT || 8080;
+  // -----------------------------
+  // Start Server
+  // -----------------------------
 
-server.listen(port, "0.0.0.0", () => {
-  console.log(`Server running on port ${port}`);
-});
+  const port = process.env.PORT || 8080;
+
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`🚀 Server running on port ${port}`);
+  });
 }
 
-startServer().catch(console.error);
+startServer().catch((err) => {
+  console.error("❌ Server failed to start:", err);
+});
