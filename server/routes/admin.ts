@@ -5,6 +5,12 @@ import { quizSubmissions } from "../db/schema";
 const router = Router();
 
 router.get("/submissions", async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
     const submissions = await db
       .select()
