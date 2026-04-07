@@ -17,7 +17,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Eye } from "lucide-react";
 
@@ -33,20 +39,44 @@ interface QuizSubmission {
   answers: string;
   status: SubmissionStatus;
   notes: string | null;
-  createdAt: string;   // FIXED (was Date)
-  updatedAt: string;   // FIXED (was Date)
+  createdAt: string;
+  updatedAt: string;
 }
 
+/* ======================================
+   SAFE DATE FORMATTER (FINAL VERSION)
+====================================== */
+const formatDateTime = (dateString?: string | null) => {
+  if (!dateString) return "—";
+
+  const date = new Date(dateString);
+
+  if (isNaN(date.getTime())) return "—";
+
+  return date.toLocaleString("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZoneName: "short",
+  });
+};
+
 export default function AdminDashboard() {
-  const [selectedSubmission, setSelectedSubmission] = useState<QuizSubmission | null>(null);
+  const [selectedSubmission, setSelectedSubmission] =
+    useState<QuizSubmission | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newStatus, setNewStatus] = useState<SubmissionStatus>("new");
   const [notes, setNotes] = useState("");
 
-  const { data: submissions, isLoading, refetch } = trpc.quiz.list.useQuery({
-    limit: 1000,
-    offset: 0,
-  });
+  const { data: submissions, isLoading, refetch } =
+    trpc.quiz.list.useQuery({
+      limit: 1000,
+      offset: 0,
+    });
 
   const updateStatusMutation = trpc.quiz.updateStatus.useMutation({
     onSuccess: () => {
@@ -55,15 +85,6 @@ export default function AdminDashboard() {
       setNotes("");
     },
   });
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString + "Z").toLocaleString("en-US", {
-      timeZone: "America/New_York",
-      dateStyle: "medium",
-      timeStyle: "short",
-      timeZoneName: "short",
-    });
-  };
 
   const handleViewDetails = (submission: QuizSubmission) => {
     setSelectedSubmission(submission);
@@ -100,7 +121,9 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Quiz Submissions Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-6">
+          Quiz Submissions Dashboard
+        </h1>
 
         <Card className="overflow-hidden">
           {isLoading ? (
@@ -116,26 +139,39 @@ export default function AdminDashboard() {
                     <TableHead>Email</TableHead>
                     <TableHead>Score</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Date (EST)</TableHead>
+                    <TableHead>Date (ET)</TableHead>
                     <TableHead className="text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
+
                 <TableBody>
                   {submissions?.map((submission) => (
                     <TableRow key={submission.id}>
                       <TableCell>{submission.name}</TableCell>
                       <TableCell>{submission.email}</TableCell>
                       <TableCell>{submission.score}%</TableCell>
+
                       <TableCell>
-                        <Badge className={getStatusColor(submission.status)}>
+                        <Badge
+                          className={getStatusColor(
+                            submission.status
+                          )}
+                        >
                           {submission.status}
                         </Badge>
                       </TableCell>
+
                       <TableCell>
-                        {formatDate(submission.createdAt)}
+                        {formatDateTime(submission.createdAt)}
                       </TableCell>
+
                       <TableCell className="text-right">
-                        <Button size="sm" onClick={() => handleViewDetails(submission)}>
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            handleViewDetails(submission)
+                          }
+                        >
                           <Eye className="w-4 h-4 mr-2" />
                           View
                         </Button>
@@ -148,46 +184,79 @@ export default function AdminDashboard() {
           )}
         </Card>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+        >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Submission Details</DialogTitle>
+              <DialogTitle>
+                Submission Details
+              </DialogTitle>
             </DialogHeader>
 
             {selectedSubmission && (
               <div className="space-y-4">
                 <div>
-                  <strong>Name:</strong> {selectedSubmission.name}
-                </div>
-                <div>
-                  <strong>Email:</strong> {selectedSubmission.email}
-                </div>
-                <div>
-                  <strong>Score:</strong> {selectedSubmission.score}%
-                </div>
-                <div>
-                  <strong>Date:</strong> {formatDate(selectedSubmission.createdAt)}
+                  <strong>Name:</strong>{" "}
+                  {selectedSubmission.name}
                 </div>
 
-                <Select value={newStatus} onValueChange={(value: SubmissionStatus) => setNewStatus(value)}>
+                <div>
+                  <strong>Email:</strong>{" "}
+                  {selectedSubmission.email}
+                </div>
+
+                <div>
+                  <strong>Score:</strong>{" "}
+                  {selectedSubmission.score}%
+                </div>
+
+                <div>
+                  <strong>Date Submitted:</strong>{" "}
+                  {formatDateTime(
+                    selectedSubmission.createdAt
+                  )}
+                </div>
+
+                <Select
+                  value={newStatus}
+                  onValueChange={(
+                    value: SubmissionStatus
+                  ) => setNewStatus(value)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new">New</SelectItem>
-                    <SelectItem value="contacted">Contacted</SelectItem>
-                    <SelectItem value="converted">Converted</SelectItem>
-                    <SelectItem value="archived">Archived</SelectItem>
+                    <SelectItem value="new">
+                      New
+                    </SelectItem>
+                    <SelectItem value="contacted">
+                      Contacted
+                    </SelectItem>
+                    <SelectItem value="converted">
+                      Converted
+                    </SelectItem>
+                    <SelectItem value="archived">
+                      Archived
+                    </SelectItem>
                   </SelectContent>
                 </Select>
 
                 <Textarea
                   placeholder="Add notes..."
                   value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
+                  onChange={(e) =>
+                    setNotes(e.target.value)
+                  }
                 />
 
-                <Button onClick={handleUpdateStatus}>Update</Button>
+                <Button
+                  onClick={handleUpdateStatus}
+                >
+                  Update
+                </Button>
               </div>
             )}
           </DialogContent>
