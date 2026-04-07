@@ -8,6 +8,9 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { setupVite, serveStatic } from "./vite";
 
+// ✅ ADD THIS
+import adminRouter from "../routes/admin";
+
 async function startServer() {
   const app = express();
   const server = createServer(app);
@@ -24,6 +27,11 @@ async function startServer() {
   app.get("/health", (_req, res) => {
     res.status(200).json({ status: "ok" });
   });
+
+  // ===============================
+  // 🔥 ADMIN ROUTES (MUST COME BEFORE FRONTEND)
+  // ===============================
+  app.use("/admin", adminRouter);
 
   // ===============================
   // OAuth Routes
