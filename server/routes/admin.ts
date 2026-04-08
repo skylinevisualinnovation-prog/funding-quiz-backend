@@ -11,6 +11,8 @@ const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
 });
 
 // ==============================
@@ -34,11 +36,36 @@ router.get("/submissions", async (req, res) => {
   if (!checkAdminAuth(req, res)) return;
 
   try {
-    const [rows] = await pool.query(
-      "SELECT * FROM quiz_submissions ORDER BY createdAt DESC"
+    const [rows] = await pool.query<any[]>(
+      `
+      SELECT
+        id,
+        name,
+        email,
+        phone,
+        score,
+        readinessLevel,
+        status,
+        notes,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+      FROM quiz_submissions
+      ORDER BY created_at DESC
+      `
     );
 
-    res.json(rows);
+    // Ensure date fields are serialized correctly
+    const formatted = rows.map((row) => ({
+      ...row,
+      createdAt: row.createdAt
+        ? new Date(row.createdAt).toISOString()
+        : null,
+      updatedAt: row.updatedAt
+        ? new Date(row.updatedAt).toISOString()
+        : null,
+    }));
+
+    res.json(formatted);
   } catch (err) {
     console.error("Fetch error:", err);
     res.status(500).json({ error: "Failed to fetch submissions" });
