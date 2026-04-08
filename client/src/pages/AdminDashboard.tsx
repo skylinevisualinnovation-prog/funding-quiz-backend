@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Eye } from "lucide-react";
+import { Loader2, Eye, Trash2 } from "lucide-react";
 
 type SubmissionStatus = "new" | "contacted" | "converted" | "archived";
 
@@ -44,13 +44,12 @@ interface QuizSubmission {
 }
 
 /* ======================================
-   SAFE DATE FORMATTER (FINAL VERSION)
+   SAFE DATE FORMATTER
 ====================================== */
 const formatDateTime = (dateString?: string | null) => {
   if (!dateString) return "—";
 
   const date = new Date(dateString);
-
   if (isNaN(date.getTime())) return "—";
 
   return date.toLocaleString("en-US", {
@@ -86,6 +85,13 @@ export default function AdminDashboard() {
     },
   });
 
+  // 🔥 NEW DELETE MUTATION
+  const deleteMutation = trpc.quiz.delete.useMutation({
+    onSuccess: () => {
+      refetch();
+    },
+  });
+
   const handleViewDetails = (submission: QuizSubmission) => {
     setSelectedSubmission(submission);
     setNewStatus(submission.status);
@@ -101,6 +107,16 @@ export default function AdminDashboard() {
       status: newStatus,
       notes: notes || undefined,
     });
+  };
+
+  // 🔥 DELETE HANDLER
+  const handleDelete = async (id: number) => {
+    const confirmed = confirm(
+      "Are you sure you want to permanently delete this submission?"
+    );
+    if (!confirmed) return;
+
+    await deleteMutation.mutateAsync({ id });
   };
 
   const getStatusColor = (status: SubmissionStatus) => {
@@ -153,9 +169,7 @@ export default function AdminDashboard() {
 
                       <TableCell>
                         <Badge
-                          className={getStatusColor(
-                            submission.status
-                          )}
+                          className={getStatusColor(submission.status)}
                         >
                           {submission.status}
                         </Badge>
@@ -165,16 +179,30 @@ export default function AdminDashboard() {
                         {formatDateTime(submission.createdAt)}
                       </TableCell>
 
+                      {/* 🔥 ACTION COLUMN UPDATED */}
                       <TableCell className="text-right">
-                        <Button
-                          size="sm"
-                          onClick={() =>
-                            handleViewDetails(submission)
-                          }
-                        >
-                          <Eye className="w-4 h-4 mr-2" />
-                          View
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              handleViewDetails(submission)
+                            }
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View
+                          </Button>
+
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() =>
+                              handleDelete(submission.id)
+                            }
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -184,6 +212,7 @@ export default function AdminDashboard() {
           )}
         </Card>
 
+        {/* DIALOG */}
         <Dialog
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
@@ -221,17 +250,15 @@ export default function AdminDashboard() {
 
                 <Select
                   value={newStatus}
-                  onValueChange={(
-                    value: SubmissionStatus
-                  ) => setNewStatus(value)}
+                  onValueChange={(value: SubmissionStatus) =>
+                    setNewStatus(value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new">
-                      New
-                    </SelectItem>
+                    <SelectItem value="new">New</SelectItem>
                     <SelectItem value="contacted">
                       Contacted
                     </SelectItem>
@@ -252,9 +279,7 @@ export default function AdminDashboard() {
                   }
                 />
 
-                <Button
-                  onClick={handleUpdateStatus}
-                >
+                <Button onClick={handleUpdateStatus}>
                   Update
                 </Button>
               </div>
