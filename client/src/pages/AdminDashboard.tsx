@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Eye, Trash2 } from "lucide-react";
+import { Loader2, Eye } from "lucide-react";
 
 type SubmissionStatus = "new" | "contacted" | "converted" | "archived";
 
@@ -39,20 +39,20 @@ interface QuizSubmission {
   answers: string;
   status: SubmissionStatus;
   notes: string | null;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;   // ✅ FIXED (was string)
+  updatedAt: Date;   // ✅ FIXED (was string)
 }
 
 /* ======================================
    SAFE DATE FORMATTER
 ====================================== */
-const formatDateTime = (dateString?: string | null) => {
-  if (!dateString) return "—";
+const formatDateTime = (date?: Date | null) => {
+  if (!date) return "—";
 
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return "—";
+  const parsed = new Date(date);
+  if (isNaN(parsed.getTime())) return "—";
 
-  return date.toLocaleString("en-US", {
+  return parsed.toLocaleString("en-US", {
     timeZone: "America/New_York",
     year: "numeric",
     month: "long",
@@ -85,13 +85,6 @@ export default function AdminDashboard() {
     },
   });
 
-  // 🔥 NEW DELETE MUTATION
-  const deleteMutation = trpc.quiz.delete.useMutation({
-    onSuccess: () => {
-      refetch();
-    },
-  });
-
   const handleViewDetails = (submission: QuizSubmission) => {
     setSelectedSubmission(submission);
     setNewStatus(submission.status);
@@ -107,16 +100,6 @@ export default function AdminDashboard() {
       status: newStatus,
       notes: notes || undefined,
     });
-  };
-
-  // 🔥 DELETE HANDLER
-  const handleDelete = async (id: number) => {
-    const confirmed = confirm(
-      "Are you sure you want to permanently delete this submission?"
-    );
-    if (!confirmed) return;
-
-    await deleteMutation.mutateAsync({ id });
   };
 
   const getStatusColor = (status: SubmissionStatus) => {
@@ -156,53 +139,53 @@ export default function AdminDashboard() {
                     <TableHead>Score</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Date (ET)</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                    <TableHead className="text-right">
+                      Action
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
 
                 <TableBody>
                   {submissions?.map((submission) => (
                     <TableRow key={submission.id}>
-                      <TableCell>{submission.name}</TableCell>
-                      <TableCell>{submission.email}</TableCell>
-                      <TableCell>{submission.score}%</TableCell>
+                      <TableCell>
+                        {submission.name}
+                      </TableCell>
+
+                      <TableCell>
+                        {submission.email}
+                      </TableCell>
+
+                      <TableCell>
+                        {submission.score}%
+                      </TableCell>
 
                       <TableCell>
                         <Badge
-                          className={getStatusColor(submission.status)}
+                          className={getStatusColor(
+                            submission.status
+                          )}
                         >
                           {submission.status}
                         </Badge>
                       </TableCell>
 
                       <TableCell>
-                        {formatDateTime(submission.createdAt)}
+                        {formatDateTime(
+                          submission.createdAt
+                        )}
                       </TableCell>
 
-                      {/* 🔥 ACTION COLUMN UPDATED */}
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() =>
-                              handleViewDetails(submission)
-                            }
-                          >
-                            <Eye className="w-4 h-4 mr-2" />
-                            View
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() =>
-                              handleDelete(submission.id)
-                            }
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
-                          </Button>
-                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            handleViewDetails(submission)
+                          }
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          View
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -212,7 +195,6 @@ export default function AdminDashboard() {
           )}
         </Card>
 
-        {/* DIALOG */}
         <Dialog
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
@@ -257,8 +239,11 @@ export default function AdminDashboard() {
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
+
                   <SelectContent>
-                    <SelectItem value="new">New</SelectItem>
+                    <SelectItem value="new">
+                      New
+                    </SelectItem>
                     <SelectItem value="contacted">
                       Contacted
                     </SelectItem>

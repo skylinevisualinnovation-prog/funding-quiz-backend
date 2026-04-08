@@ -1,10 +1,10 @@
-import adminRoutes from "./routes/admin";
+import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
-import adminRoutes from "./routes/admin";
-// import quizRoutes from "./routes/quiz"; // if you have this
+
+import adminRouter from "./routes/admin";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,56 +13,45 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // -----------------------------
+  // ==============================
   // Middleware
-  // -----------------------------
+  // ==============================
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  // -----------------------------
-  // API Routes (REGISTER FIRST)
-  // -----------------------------
-
-  app.use("/admin", adminRoutes);
-
-  // If you have quiz routes:
-  // app.use("/api/quiz", quizRoutes);
-
-  // Health check route (optional but smart)
+  // ==============================
+  // Health Check
+  // ==============================
   app.get("/health", (_req, res) => {
-    res.json({ status: "ok" });
+    res.status(200).json({ status: "ok" });
   });
 
-  // -----------------------------
-  // Static Frontend Serving
-  // -----------------------------
+  // ==============================
+  // Admin Routes
+  // ==============================
+  app.use("/admin", adminRouter);
 
-  const staticPath =
-    process.env.NODE_ENV === "production"
-      ? path.resolve(__dirname, "public")
-      : path.resolve(__dirname, "..", "dist", "public");
-
-  app.use(express.static(staticPath));
-
-  // -----------------------------
-  // Catch-All (MUST BE LAST)
-  // -----------------------------
+  // ==============================
+  // Serve Frontend (Production)
+  // ==============================
+  const publicPath = path.join(__dirname, "../dist/public");
+  app.use(express.static(publicPath));
 
   app.get("*", (_req, res) => {
-    res.sendFile(path.join(staticPath, "index.html"));
+    res.sendFile(path.join(publicPath, "index.html"));
   });
 
-  // -----------------------------
+  // ==============================
   // Start Server
-  // -----------------------------
+  // ==============================
+  const PORT = Number(process.env.PORT) || 3000;
 
-  const port = process.env.PORT || 8080;
-
-  server.listen(port, "0.0.0.0", () => {
-    console.log(`🚀 Server running on port ${port}`);
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Server running on port ${PORT}`);
   });
 }
 
 startServer().catch((err) => {
   console.error("❌ Server failed to start:", err);
+  process.exit(1);
 });
