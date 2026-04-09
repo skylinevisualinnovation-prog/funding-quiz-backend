@@ -56,15 +56,14 @@ async function startServer() {
     serveStatic(app);
   }
 
-  // ==============================
-  // Start Server
-  // ==============================
-  const PORT = Number(process.env.PORT);
+// ==============================
+// Start Server
+// ==============================
+const PORT = Number(process.env.PORT) || 3000;
 
-  if (!PORT) {
-    console.error("❌ No PORT provided by Railway.");
-    process.exit(1);
-  }
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
 
   server.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 Server running on port ${PORT}`);
